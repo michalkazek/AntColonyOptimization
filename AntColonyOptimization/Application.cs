@@ -54,26 +54,29 @@ namespace AntColonyOptimization
         {
             var probabilityList = new List<double>();
             double denominator = 0.0;
-            var unvisitedCitiesNumber = matrixSize - ant.visitedCitiesIdList.Count;
 
-            for (int cityID = 0; cityID < unvisitedCitiesNumber; cityID++)
+            for (int cityID = 0; cityID < matrixSize; cityID++)
             {
-                denominator += Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], beta);
-            }
-            for (int cityID = 0; cityID < unvisitedCitiesNumber; cityID++)
-            {
-                var numerator = 0.0;
-                if(cityID != ant.currentCityID)
+                if (ant.visitedCitiesIdList.Contains(cityID))
                 {
-                    numerator = Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(1 / Convert.ToDouble(distanceMatrix[ant.currentCityID, cityID]), beta);
+                    probabilityList.Add(0);
                 }
                 else
                 {
-                    numerator = 0;
-                }
-
-                probabilityList.Add(Math.Round((numerator / denominator), 4));
+                    var numerator = 0.0;
+                    if (cityID != ant.currentCityID)
+                    {
+                        numerator = Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(1 / Convert.ToDouble(distanceMatrix[ant.currentCityID, cityID]), beta);
+                    }
+                    else
+                    {
+                        numerator = 0;
+                    }
+                    probabilityList.Add(numerator);
+                    denominator += Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], beta);
+                }                
             }
+            probabilityList = probabilityList.Select(x => Math.Round((x / denominator), 4)).ToList();
         }
     }
 }
