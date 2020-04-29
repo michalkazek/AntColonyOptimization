@@ -11,6 +11,8 @@ namespace AntColonyOptimization
         public static int matrixSize;
         public static float alfa;
         public static float beta;
+        public static float bestDistance;
+        public static List<int> bestRoute;
 
         static public void Run()
         {
@@ -19,11 +21,19 @@ namespace AntColonyOptimization
             matrixSize = fileReader.GetMatrixSize();
             PheromoneMatrixManager phm = new PheromoneMatrixManager(matrixSize);
             
-            alfa = 2;
-            beta = 5;
+            alfa = 4;
+            beta = 2;
+            bestDistance = 9999999;
+            bestRoute = new List<int>();
 
         
-            Start(10, phm, distanceMatrix, 50);
+            Start(70, phm, distanceMatrix, 100);
+            Console.WriteLine($"Best ant travlled {bestDistance}");
+
+            foreach (var item in bestRoute)
+            {
+                Console.Write(item + " ");
+            }
 
             Console.ReadKey();
         }
@@ -42,7 +52,7 @@ namespace AntColonyOptimization
                         MoveAntToNextCity(ants[i], nextCityForAnt, phm, distanceMatrix);
                     }
                 }
-                PrintAllAntsDistance(ants);
+                PrintAllAntsDistance(ants, it);
                 ResetAntMemory(ants, randomGenerator, matrixSize);
             }                                
         }
@@ -57,11 +67,16 @@ namespace AntColonyOptimization
             }                
         }
 
-        private static void PrintAllAntsDistance(List<Ant> ants)
+        private static void PrintAllAntsDistance(List<Ant> ants, int iteration)
         {
             foreach (var ant in ants)
             {
-                Console.WriteLine($"Ant {ant.antID} has travelled {ant.distance}");
+                if(ant.distance < bestDistance)
+                {
+                    Console.WriteLine($"Ant travelled {ant.distance} in {iteration}");
+                    bestDistance = ant.distance;
+                    bestRoute = new List<int>(ant.visitedCitiesIdList);
+                }
             }
         }
 
