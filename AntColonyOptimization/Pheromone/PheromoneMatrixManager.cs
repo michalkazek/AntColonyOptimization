@@ -8,12 +8,12 @@ namespace AntColonyOptimization
 {
     class PheromoneMatrixManager
     {
-        public float[,] PheromoneMatrix { get; set; }
+        public double[,] PheromoneMatrix { get; set; }
         public int MatrixSize { get; set; }
 
         public PheromoneMatrixManager(int matrixSize)
         {
-            PheromoneMatrix = new float[matrixSize, matrixSize];
+            PheromoneMatrix = new double[matrixSize, matrixSize];
             MatrixSize = matrixSize;
             InitializePhermoneMatrix();
         }
@@ -29,12 +29,12 @@ namespace AntColonyOptimization
             }
         }
 
-        public void UpdateSelectedPhermoneMatrixCell(int x, int y, float value)
+        public void UpdateSelectedPhermoneMatrixCell(int x, int y, double value)
         {
             PheromoneMatrix[x, y] += value;
         }
 
-        public void UpdatePhermoneMatrixByEvaporation(float evaporationValue)
+        public void UpdatePhermoneMatrixByEvaporation(double evaporationValue)
         {
             for (int x = 0; x < MatrixSize; x++)
             {
