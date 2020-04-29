@@ -34,8 +34,25 @@ namespace AntColonyOptimization
 
             for (int i = 0; i < numberOfAnts; i++)
             {
-                CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
+                var probabilityList = CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
+                var nextCityForAnt = ChooseNextCityForAnt(probabilityList, randomGenerator);
             }
+        }
+
+        private static int ChooseNextCityForAnt(List<double> probabilityList, Random randomGenerator)
+        {
+            var probabilitySum = probabilityList.Sum();
+            probabilityList = probabilityList.Select(x => Math.Round(x*100 / probabilitySum, 10)).ToList();
+            var drawnNumber = randomGenerator.NextDouble();
+            int i = 0;
+            var currentProbabilitySum = probabilityList[i];
+            
+            while(drawnNumber > currentProbabilitySum)
+            {
+                currentProbabilitySum += probabilityList[i];
+                i++;
+            }
+            return i;
         }
 
         static private List<Ant> CreateAntColony(Random randomGenerator, int numberOfAnts)
@@ -50,7 +67,7 @@ namespace AntColonyOptimization
             return ants;
         }
 
-        static private void CalculateNextCitiesProbability(Ant ant, PheromoneMatrixManager phm, int[,] distanceMatrix)
+        static private List<double> CalculateNextCitiesProbability(Ant ant, PheromoneMatrixManager phm, int[,] distanceMatrix)
         {
             var probabilityList = new List<double>();
             double denominator = 0.0;
@@ -76,7 +93,7 @@ namespace AntColonyOptimization
                     denominator += Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], beta);
                 }                
             }
-            probabilityList = probabilityList.Select(x => Math.Round((x / denominator), 4)).ToList();
+            return probabilityList.Select(x => Math.Round((x / denominator), 4)).ToList();
         }
     }
 }
