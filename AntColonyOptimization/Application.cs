@@ -23,25 +23,38 @@ namespace AntColonyOptimization
             beta = 5;
 
         
-            Start(100, phm, distanceMatrix);
+            Start(10, phm, distanceMatrix, 50);
 
             Console.ReadKey();
         }
-        static public void Start(int numberOfAnts, PheromoneMatrixManager phm, int[,] distanceMatrix)
+        static public void Start(int numberOfAnts, PheromoneMatrixManager phm, int[,] distanceMatrix, int numberOfIteration)
         {            
             var randomGenerator = new Random();
             List<Ant> ants = CreateAntColony(randomGenerator, numberOfAnts);
-
-            for (int j = 0; j < matrixSize; j++)
-            {
-                for (int i = 0; i < numberOfAnts; i++)
+            for (int it = 0; it < numberOfIteration; it++)
+            {                
+                for (int j = 0; j < matrixSize; j++)
                 {
-                    var probabilityList = CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
-                    var nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList, randomGenerator);
-                    MoveAntToNextCity(ants[i], nextCityForAnt, phm, distanceMatrix);
+                    for (int i = 0; i < numberOfAnts; i++)
+                    {
+                        var probabilityList = CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
+                        var nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList, randomGenerator);
+                        MoveAntToNextCity(ants[i], nextCityForAnt, phm, distanceMatrix);
+                    }
                 }
-            }
-            PrintAllAntsDistance(ants);           
+                PrintAllAntsDistance(ants);
+                ResetAntMemory(ants, randomGenerator, matrixSize);
+            }                                
+        }
+
+        private static void ResetAntMemory(List<Ant> ants, Random randomGenerator, int matrixSize)
+        {
+            foreach (var ant in ants)
+            {
+                ant.distance = 0.0f;
+                ant.visitedCitiesIdList.Clear();
+                ant.currentCityID = randomGenerator.Next(matrixSize);
+            }                
         }
 
         private static void PrintAllAntsDistance(List<Ant> ants)
@@ -67,15 +80,15 @@ namespace AntColonyOptimization
         private static int ChooseNextCityForAnt(Ant ant, List<double> probabilityList, Random randomGenerator)
         {
             var probabilitySum = probabilityList.Sum();
-            probabilityList = probabilityList.Select(x => Math.Round(x*100 / probabilitySum, 10)).ToList();
+            probabilityList = probabilityList.Select(x => Math.Round(x / probabilitySum, 10)).ToList();
             var drawnNumber = randomGenerator.NextDouble();
             int i = 0;
             var currentProbabilitySum = probabilityList[i];
             
-            while(drawnNumber > currentProbabilitySum && ant.visitedCitiesIdList.Contains(i))
+            while(drawnNumber > currentProbabilitySum || ant.visitedCitiesIdList.Contains(i))
             {
-                currentProbabilitySum += probabilityList[i];
                 i++;
+                currentProbabilitySum += probabilityList[i];               
             }
             return i;
         }
