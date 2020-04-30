@@ -30,17 +30,12 @@ namespace AntColonyOptimization
             Console.WriteLine($"Best ant travelled {bestDistance}");
             CheckIsBestRouteCorrect(distanceMatrix, phm);
 
-            //foreach (var item in bestRoute)
-            //{
-            //    Console.Write(item+" ");
-            //}
-
             Console.ReadKey();
         }
         static public void Start(int numberOfAnts, PheromoneMatrixManager phm, int[,] distanceMatrix, int numberOfIteration)
         {            
             var randomGenerator = new Random();
-            List<Ant> ants = CreateAntColony(randomGenerator, numberOfAnts);
+            List<Ant> ants = AntColonyManager.CreateAntColony(numberOfAnts, matrixSize, randomGenerator);
             for (int it = 0; it < numberOfIteration; it++)
             {                
                 for (int j = 0; j < matrixSize; j++)
@@ -61,31 +56,12 @@ namespace AntColonyOptimization
                     }
                 }
                 PrintAllAntsDistance(ants, it);
-                ResetAntMemory(ants, randomGenerator, matrixSize);
+                AntColonyManager.ResetAntColonyMemory(ants, matrixSize, randomGenerator);
             }                                
         }
-        static private List<Ant> CreateAntColony(Random randomGenerator, int numberOfAnts)
-        {
-            List<Ant> ants = new List<Ant>();
+        
 
-            for (int i = 0; i < numberOfAnts; i++)
-            {
-                var drawnNumber = randomGenerator.Next(matrixSize);
-                ants.Add(AntColonyManager.CreateNewAnt(drawnNumber));
-            }
-            return ants;
-        }
-
-        private static void ResetAntMemory(List<Ant> ants, Random randomGenerator, int matrixSize)
-        {
-            foreach (var ant in ants)
-            {
-                ant.distance = 0.0f;
-                ant.visitedCitiesIdList.Clear();               
-                ant.currentCityID = randomGenerator.Next(matrixSize);
-                ant.visitedCitiesIdList.Add(ant.currentCityID);
-            }                
-        }
+        
 
         private static void PrintAllAntsDistance(List<Ant> ants, int iteration)
         {
