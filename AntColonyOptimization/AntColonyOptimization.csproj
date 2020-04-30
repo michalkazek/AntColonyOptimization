@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alghoritm\Alghoritm.cs" />
     <Compile Include="Ant\Ant.cs" />
     <Compile Include="Ant\AntColonyManager.cs" />
     <Compile Include="Application.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="Pheromone\PheromoneMatrixManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\DistanceChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

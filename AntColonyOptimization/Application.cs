@@ -7,34 +7,39 @@ using System.Threading.Tasks;
 namespace AntColonyOptimization
 {
     class Application
-    {
-        public static int matrixSize;
-        public static float alfa;
-        public static float beta;
-        public static float bestDistance;
-        public static List<int> bestRoute;
+    {              
+        private static int[,] distanceMatrix;
+        private static int matrixSize;
+        private static PheromoneMatrixManager phm;
+        private static float alfa = 4;
+        private static float beta = 2;
+        private static float bestDistanceFound;
+        private static List<int> bestRouteFound;
+        private static Random randomGenerator;
 
-        static public void Run()
-        {
-            FileReader fileReader = new FileReader();       
-            var distanceMatrix = fileReader.CreateDistanceMatrix();
-            matrixSize = fileReader.GetMatrixSize();
-            PheromoneMatrixManager phm = new PheromoneMatrixManager(matrixSize);
-            
-            alfa = 4;
-            beta = 2;
-            bestDistance = 9999999;
-            bestRoute = new List<int>();
-            
-            Start(20, phm, distanceMatrix, 100);
-            Console.WriteLine($"Best ant travelled {bestDistance}");
-            CheckIsBestRouteCorrect(distanceMatrix, phm);
+        public static void Run()
+        {            
+            GeneratePrerequisite();
+            Start(50, 1000);
+            Console.WriteLine($"Best ant travelled {bestDistanceFound}");
+            DistanceChecker.CheckIsBestRouteCorrect(bestRouteFound, bestDistanceFound);
 
             Console.ReadKey();
         }
-        static public void Start(int numberOfAnts, PheromoneMatrixManager phm, int[,] distanceMatrix, int numberOfIteration)
+
+        private static void GeneratePrerequisite()
+        {
+            FileReader fileReader = new FileReader();
+            distanceMatrix = fileReader.CreateDistanceMatrix();
+            matrixSize = fileReader.GetMatrixSize();
+            phm = new PheromoneMatrixManager(matrixSize);
+            bestDistanceFound = 9999999;
+            bestRouteFound = new List<int>();
+        }
+
+        public static void Start(int numberOfAnts, int numberOfIteration)
         {            
-            var randomGenerator = new Random();
+            randomGenerator = new Random();
             List<Ant> ants = AntColonyManager.CreateAntColony(numberOfAnts, matrixSize, randomGenerator);
             for (int it = 0; it < numberOfIteration; it++)
             {                
@@ -49,34 +54,31 @@ namespace AntColonyOptimization
                         }
                         else
                         {
-                            var probabilityList = CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
-                            nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList, randomGenerator);
+                            var probabilityList = CalculateNextCitiesProbability(ants[i]);
+                            nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList);
                         }                        
-                        MoveAntToNextCity(ants[i], nextCityForAnt, phm, distanceMatrix);
+                        MoveAntToNextCity(ants[i], nextCityForAnt);
                     }
                 }
-                PrintAllAntsDistance(ants, it);
+                CheckIfBetterSolutionWasFound(ants, it);
                 AntColonyManager.ResetAntColonyMemory(ants, matrixSize, randomGenerator);
             }                                
         }
-        
 
-        
-
-        private static void PrintAllAntsDistance(List<Ant> ants, int iteration)
+        private static void CheckIfBetterSolutionWasFound(List<Ant> antColony, int iteration)
         {
-            foreach (var ant in ants)
+            foreach (var ant in antColony)
             {
-                if(ant.distance < bestDistance)
-                {
-                    Console.WriteLine($"Ant travelled {ant.distance} in {iteration}");
-                    bestDistance = ant.distance;
-                    bestRoute = new List<int>(ant.visitedCitiesIdList);
+                if (ant.distance < bestDistanceFound)
+                {                   
+                    bestDistanceFound = ant.distance;
+                    bestRouteFound = new List<int>(ant.visitedCitiesIdList);
+                    Console.WriteLine($"Ant travelled {bestDistanceFound} in {iteration}");
                 }
             }
         }
 
-        static private List<double> CalculateNextCitiesProbability(Ant ant, PheromoneMatrixManager phm, int[,] distanceMatrix)
+        private static List<double> CalculateNextCitiesProbability(Ant ant)
         {
             var probabilityList = new List<double>();
             double denominator = 0.0;
@@ -105,7 +107,7 @@ namespace AntColonyOptimization
             return probabilityList.Select(x => Math.Round((x / denominator), 4)).ToList();
         }
 
-        private static int ChooseNextCityForAnt(Ant ant, List<double> probabilityList, Random randomGenerator)
+        private static int ChooseNextCityForAnt(Ant ant, List<double> probabilityList)
         {
             var probabilitySum = probabilityList.Sum();
             probabilityList = probabilityList.Select(x => Math.Round(x / probabilitySum, 10)).ToList();
@@ -121,7 +123,7 @@ namespace AntColonyOptimization
             return i;
         }
 
-        private static void MoveAntToNextCity(Ant ant, int nextCityForAnt, PheromoneMatrixManager phm, int[,] distanceMatrix)
+        public static void MoveAntToNextCity(Ant ant, int nextCityForAnt)
         {
             var distanceBetweenCities = distanceMatrix[ant.currentCityID, nextCityForAnt];
             ant.distance += distanceBetweenCities;
@@ -133,20 +135,5 @@ namespace AntColonyOptimization
             ant.currentCityID = nextCityForAnt;
             ant.visitedCitiesIdList.Add(nextCityForAnt);
         }      
-
-        private static void CheckIsBestRouteCorrect(int[,] distanceMatrix, PheromoneMatrixManager phm)
-        {
-            var checkingList = bestRoute;
-            checkingList.Add(checkingList.First());
-            checkingList.RemoveAt(0);
-
-            var ant = new Ant(checkingList.Last());
-
-            for (int i = 0; i < checkingList.Count; i++)
-            {
-                MoveAntToNextCity(ant, checkingList[i], phm, distanceMatrix);
-            }
-            Console.WriteLine($"Best ant should travel {ant.distance}. {bestDistance-ant.distance}");                      
-        }
     }
 }
