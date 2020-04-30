@@ -6,41 +6,28 @@ using System.Threading.Tasks;
 
 namespace AntColonyOptimization
 {
-    class PheromoneMatrixManager
+    static class PheromoneMatrixManager
     {
-        public double[,] PheromoneMatrix { get; set; }
-        public int MatrixSize { get; set; }
-
-        public PheromoneMatrixManager(int matrixSize)
+        public static double[,] CreatePhermoneMatrix(int matrixSize, float initialValue)
         {
-            PheromoneMatrix = new double[matrixSize, matrixSize];
-            MatrixSize = matrixSize;
-            InitializePhermoneMatrix();
-        }
-
-        public void InitializePhermoneMatrix()
-        {
-            for (int x = 0; x < MatrixSize; x++)
+            var pheromoneMatrix = new double[matrixSize, matrixSize];
+            for (int x = 0; x < matrixSize; x++)
             {
-                for (int y = 0; y < MatrixSize; y++)
+                for (int y = 0; y < matrixSize; y++)
                 {
-                    PheromoneMatrix[x, y] = 0.001f;
+                    pheromoneMatrix[x, y] = initialValue;
                 }
             }
+            return pheromoneMatrix;
         }
 
-        public void UpdateSelectedPhermoneMatrixCell(int x, int y, double value)
+        public static void UpdatePhermoneMatrixByEvaporation(double[,] pheromoneMatrix, double evaporationValue)
         {
-            PheromoneMatrix[x, y] += value;
-        }
-
-        public void UpdatePhermoneMatrixByEvaporation(double evaporationValue)
-        {
-            for (int x = 0; x < MatrixSize; x++)
+            for (int x = 0; x < pheromoneMatrix.Length; x++)
             {
-                for (int y = 0; y < MatrixSize; y++)
+                for (int y = 0; y < pheromoneMatrix.Length; y++)
                 {
-                    PheromoneMatrix[x, y] -= evaporationValue;
+                    pheromoneMatrix[x, y] -= evaporationValue;
                 }
             }
         }

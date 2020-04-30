@@ -10,7 +10,7 @@ namespace AntColonyOptimization
     {              
         private static int[,] distanceMatrix;
         private static int matrixSize;
-        private static PheromoneMatrixManager phm;
+        private static double[,] pheromoneMatrix;
         private static float alfa = 4;
         private static float beta = 2;
         private static float bestDistanceFound;
@@ -20,7 +20,7 @@ namespace AntColonyOptimization
         public static void Run()
         {            
             GeneratePrerequisite();
-            Start(50, 1000);
+            Start(50, 100);
             Console.WriteLine($"Best ant travelled {bestDistanceFound}");
             DistanceChecker.CheckIsBestRouteCorrect(bestRouteFound, bestDistanceFound);
 
@@ -32,7 +32,7 @@ namespace AntColonyOptimization
             FileReader fileReader = new FileReader();
             distanceMatrix = fileReader.CreateDistanceMatrix();
             matrixSize = fileReader.GetMatrixSize();
-            phm = new PheromoneMatrixManager(matrixSize);
+            pheromoneMatrix = PheromoneMatrixManager.CreatePhermoneMatrix(matrixSize, 0.001f);
             bestDistanceFound = 9999999;
             bestRouteFound = new List<int>();
         }
@@ -94,14 +94,14 @@ namespace AntColonyOptimization
                     var numerator = 0.0;
                     if (cityID != ant.currentCityID)
                     {
-                        numerator = Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(1 / Convert.ToDouble(distanceMatrix[ant.currentCityID, cityID]), beta);
+                        numerator = Math.Pow(pheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(1 / Convert.ToDouble(distanceMatrix[ant.currentCityID, cityID]), beta);
                     }
                     else
                     {
                         numerator = 0;
                     }
                     probabilityList.Add(numerator);
-                    denominator += Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], beta);
+                    denominator += Math.Pow(pheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(pheromoneMatrix[ant.currentCityID, cityID], beta);
                 }
             }
             return probabilityList.Select(x => Math.Round((x / denominator), 4)).ToList();
@@ -130,7 +130,7 @@ namespace AntColonyOptimization
 
             if (nextCityForAnt != ant.currentCityID)
             {
-                phm.UpdateSelectedPhermoneMatrixCell(ant.currentCityID, nextCityForAnt, 1 / (Math.Pow(distanceBetweenCities, 2)));
+                pheromoneMatrix[ant.currentCityID, nextCityForAnt] = 1 / (Math.Pow(distanceBetweenCities, 2));
             }
             ant.currentCityID = nextCityForAnt;
             ant.visitedCitiesIdList.Add(nextCityForAnt);
