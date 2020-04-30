@@ -32,10 +32,9 @@ namespace AntColonyOptimization
         public void Run(int numberOfAnts, int numberOfIterations, string fileName)
         {
             GeneratePrerequisite(fileName);
-            Start(numberOfAnts, numberOfIterations);
-            Console.WriteLine($"Best ant travelled {BestFoundDistance}");
-            DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance);
-        }
+            Start(numberOfAnts, numberOfIterations);            
+            PrintSummary(DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance));           
+        }        
 
         private void GeneratePrerequisite(string fileName)
         {
@@ -47,44 +46,31 @@ namespace AntColonyOptimization
             BestFoundRoute = new List<int>();
         }
 
-        private void Start(int numberOfAnts, int numberOfIteration)
+        private void Start(int numberOfAnts, int numberOfIterations)
         {
-            List<Ant> ants = AntColonyManager.CreateAntColony(numberOfAnts, MatrixSize, RandomGenerator);
-            for (int it = 0; it < numberOfIteration; it++)
+            List<Ant> antColony = AntColonyManager.CreateAntColony(numberOfAnts, MatrixSize, RandomGenerator);
+            for (int iterationCounter = 0; iterationCounter < numberOfIterations; iterationCounter++)
             {
-                for (int j = 0; j < MatrixSize; j++)
+                for (int visitedCityCounter = 0; visitedCityCounter < MatrixSize; visitedCityCounter++)
                 {
-                    for (int i = 0; i < numberOfAnts; i++)
+                    for (int antCounter = 0; antCounter < numberOfAnts; antCounter++)
                     {
-                        int nextCityForAnt;
-                        if (j == MatrixSize - 1)
+                        int nextCityIDForCurrentAnt;
+                        if (visitedCityCounter == (MatrixSize - 1))
                         {
-                            nextCityForAnt = ants[i].visitedCitiesIdList.First();
+                            nextCityIDForCurrentAnt = antColony[antCounter].visitedCitiesIdList.First();
                         }
                         else
                         {
-                            var probabilityList = CalculateNextCitiesProbability(ants[i]);
-                            nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList);
+                            var probabilityList = CalculateNextCitiesProbability(antColony[antCounter]);
+                            nextCityIDForCurrentAnt = ChooseNextCityForAnt(antColony[antCounter], probabilityList);
                         }
-                        MoveAntToNextCity(ants[i], nextCityForAnt);
+                        MoveAntToNextCity(antColony[antCounter], nextCityIDForCurrentAnt);
                     }
                     PheromoneMatrixManager.UpdatePhermoneMatrixByEvaporation(PheromoneMatrix, EvaporationValue);
                 }
-                CheckIfBetterSolutionWasFound(ants, it);
-                AntColonyManager.ResetAntColonyMemory(ants, MatrixSize, RandomGenerator);
-            }
-        }
-
-        private void CheckIfBetterSolutionWasFound(List<Ant> antColony, int iteration)
-        {
-            foreach (var ant in antColony)
-            {
-                if (ant.distance < BestFoundDistance)
-                {
-                    BestFoundDistance = ant.distance;
-                    BestFoundRoute = new List<int>(ant.visitedCitiesIdList);
-                    Console.WriteLine($"Ant travelled {BestFoundDistance} in {iteration}");
-                }
+                CheckIfBetterSolutionWasFound(antColony, iterationCounter);
+                AntColonyManager.ResetAntColonyMemory(antColony, MatrixSize, RandomGenerator);
             }
         }
 
@@ -122,15 +108,15 @@ namespace AntColonyOptimization
             var probabilitySum = probabilityList.Sum();
             probabilityList = probabilityList.Select(x => Math.Round(x / probabilitySum, 10)).ToList();
             var drawnNumber = RandomGenerator.NextDouble();
-            int i = 0;
-            var currentProbabilitySum = probabilityList[i];
+            int cityID = 0;
+            var currentProbabilitySum = probabilityList[cityID];
 
-            while (drawnNumber > currentProbabilitySum || ant.visitedCitiesIdList.Contains(i))
+            while (drawnNumber > currentProbabilitySum || ant.visitedCitiesIdList.Contains(cityID))
             {
-                i++;
-                currentProbabilitySum += probabilityList[i];
+                cityID++;
+                currentProbabilitySum += probabilityList[cityID];
             }
-            return i;
+            return cityID;
         }
 
         private void MoveAntToNextCity(Ant ant, int nextCityForAnt)
@@ -144,6 +130,23 @@ namespace AntColonyOptimization
             }
             ant.currentCityID = nextCityForAnt;
             ant.visitedCitiesIdList.Add(nextCityForAnt);
+        }
+
+        private void CheckIfBetterSolutionWasFound(List<Ant> antColony, int iteration)
+        {
+            antColony.ForEach(ant => {
+                if (ant.distance < BestFoundDistance)
+                {
+                    BestFoundDistance = ant.distance;
+                    BestFoundRoute = new List<int>(ant.visitedCitiesIdList);
+                    Console.WriteLine($"Ant travelled {BestFoundDistance} in {iteration}.");
+                }
+            });
+        }
+
+        private void PrintSummary(string isBestRouteCorrect)
+        {
+            Console.WriteLine($"The shortest route found by an ant is {BestFoundDistance}. [{isBestRouteCorrect}]");
         }
     }
 }
