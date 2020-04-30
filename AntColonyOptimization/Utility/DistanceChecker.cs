@@ -8,7 +8,7 @@ namespace AntColonyOptimization
 {
     static class DistanceChecker
     {
-        public static void CheckIsBestRouteCorrect(List<int> bestRouteFound, float bestDistanceFound)
+        public static void CheckIsBestRouteCorrect(Action<Ant, int> MoveAntToNextCity, List<int> bestRouteFound, float bestDistanceFound)
         {
             var checkingList = bestRouteFound;
             checkingList.Add(checkingList.First());
@@ -18,7 +18,7 @@ namespace AntColonyOptimization
 
             for (int i = 0; i < checkingList.Count; i++)
             {
-                Application.MoveAntToNextCity(ant, checkingList[i]);
+                MoveAntToNextCity(ant, checkingList[i]);
             }
             if(bestDistanceFound - ant.distance == 0)
             {

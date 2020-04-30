@@ -9,7 +9,13 @@ namespace AntColonyOptimization
 {
     class FileReader
     {
+        public string FileName { get; set; }
         private int matrixSize;
+
+        public FileReader(string fileName)
+        {
+            FileName = fileName;
+        }       
 
         public int[,] CreateDistanceMatrix()
         {
@@ -20,7 +26,7 @@ namespace AntColonyOptimization
             List<string> splittedLine = new List<string>();
             while (!isFileCorrect)
             {
-                string filePath = @"D:\Dokumenty\Visual Studio 2015\Projects\AntColonyOptimization\AntColonyOptimization\Data\berlin52.txt";
+                string filePath = $@"D:\Dokumenty\Visual Studio 2015\Projects\AntColonyOptimization\AntColonyOptimization\Data\{FileName}.txt";
                 try
                 {
                     using (StreamReader reader = new StreamReader(filePath))
