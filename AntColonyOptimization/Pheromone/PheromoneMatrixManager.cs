@@ -23,9 +23,10 @@ namespace AntColonyOptimization
 
         public static void UpdatePhermoneMatrixByEvaporation(double[,] pheromoneMatrix, double evaporationValue)
         {
-            for (int x = 0; x < pheromoneMatrix.Length; x++)
+            int matrixSize = Convert.ToInt32(Math.Sqrt(pheromoneMatrix.Length));
+            for (int x = 0; x < matrixSize; x++)
             {
-                for (int y = 0; y < pheromoneMatrix.Length; y++)
+                for (int y = 0; y < matrixSize; y++)
                 {
                     pheromoneMatrix[x, y] -= evaporationValue;
                 }

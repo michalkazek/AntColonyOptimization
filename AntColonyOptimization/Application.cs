@@ -11,8 +11,9 @@ namespace AntColonyOptimization
         private static int[,] distanceMatrix;
         private static int matrixSize;
         private static double[,] pheromoneMatrix;
-        private static float alfa = 4;
-        private static float beta = 2;
+        private static float alfa = 2;
+        private static float beta = 5;
+        private static float evaporationValue = 0.00000001f;
         private static float bestDistanceFound;
         private static List<int> bestRouteFound;
         private static Random randomGenerator;
@@ -59,6 +60,7 @@ namespace AntColonyOptimization
                         }                        
                         MoveAntToNextCity(ants[i], nextCityForAnt);
                     }
+                    PheromoneMatrixManager.UpdatePhermoneMatrixByEvaporation(pheromoneMatrix, evaporationValue);
                 }
                 CheckIfBetterSolutionWasFound(ants, it);
                 AntColonyManager.ResetAntColonyMemory(ants, matrixSize, randomGenerator);
