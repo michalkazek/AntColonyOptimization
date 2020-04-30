@@ -25,15 +25,15 @@ namespace AntColonyOptimization
             beta = 2;
             bestDistance = 9999999;
             bestRoute = new List<int>();
+            
+            Start(20, phm, distanceMatrix, 100);
+            Console.WriteLine($"Best ant travelled {bestDistance}");
+            CheckIsBestRouteCorrect(distanceMatrix, phm);
 
-        
-            Start(70, phm, distanceMatrix, 100);
-            Console.WriteLine($"Best ant travlled {bestDistance}");
-
-            foreach (var item in bestRoute)
-            {
-                Console.Write(item + " ");
-            }
+            //foreach (var item in bestRoute)
+            //{
+            //    Console.Write(item+" ");
+            //}
 
             Console.ReadKey();
         }
@@ -47,8 +47,16 @@ namespace AntColonyOptimization
                 {
                     for (int i = 0; i < numberOfAnts; i++)
                     {
-                        var probabilityList = CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
-                        var nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList, randomGenerator);
+                        int nextCityForAnt;
+                        if (j == matrixSize-1)
+                        {
+                            nextCityForAnt = ants[i].visitedCitiesIdList.First();
+                        }
+                        else
+                        {
+                            var probabilityList = CalculateNextCitiesProbability(ants[i], phm, distanceMatrix);
+                            nextCityForAnt = ChooseNextCityForAnt(ants[i], probabilityList, randomGenerator);
+                        }                        
                         MoveAntToNextCity(ants[i], nextCityForAnt, phm, distanceMatrix);
                     }
                 }
@@ -56,14 +64,26 @@ namespace AntColonyOptimization
                 ResetAntMemory(ants, randomGenerator, matrixSize);
             }                                
         }
+        static private List<Ant> CreateAntColony(Random randomGenerator, int numberOfAnts)
+        {
+            List<Ant> ants = new List<Ant>();
+
+            for (int i = 0; i < numberOfAnts; i++)
+            {
+                var drawnNumber = randomGenerator.Next(matrixSize);
+                ants.Add(AntColonyManager.CreateNewAnt(drawnNumber));
+            }
+            return ants;
+        }
 
         private static void ResetAntMemory(List<Ant> ants, Random randomGenerator, int matrixSize)
         {
             foreach (var ant in ants)
             {
                 ant.distance = 0.0f;
-                ant.visitedCitiesIdList.Clear();
+                ant.visitedCitiesIdList.Clear();               
                 ant.currentCityID = randomGenerator.Next(matrixSize);
+                ant.visitedCitiesIdList.Add(ant.currentCityID);
             }                
         }
 
@@ -78,46 +98,6 @@ namespace AntColonyOptimization
                     bestRoute = new List<int>(ant.visitedCitiesIdList);
                 }
             }
-        }
-
-        private static void MoveAntToNextCity(Ant ant, int nextCityForAnt, PheromoneMatrixManager phm, int[,] distanceMatrix)
-        {
-            var distanceBetweenCities = distanceMatrix[ant.currentCityID, nextCityForAnt];
-            ant.distance += distanceBetweenCities;
-            if (nextCityForAnt != ant.currentCityID)
-            {
-                phm.UpdateSelectedPhermoneMatrixCell(ant.currentCityID, nextCityForAnt, 1 / (Math.Pow(distanceBetweenCities, 2)));
-            }                        
-            ant.currentCityID = nextCityForAnt;
-            ant.visitedCitiesIdList.Add(nextCityForAnt);                     
-        }
-
-        private static int ChooseNextCityForAnt(Ant ant, List<double> probabilityList, Random randomGenerator)
-        {
-            var probabilitySum = probabilityList.Sum();
-            probabilityList = probabilityList.Select(x => Math.Round(x / probabilitySum, 10)).ToList();
-            var drawnNumber = randomGenerator.NextDouble();
-            int i = 0;
-            var currentProbabilitySum = probabilityList[i];
-            
-            while(drawnNumber > currentProbabilitySum || ant.visitedCitiesIdList.Contains(i))
-            {
-                i++;
-                currentProbabilitySum += probabilityList[i];               
-            }
-            return i;
-        }
-
-        static private List<Ant> CreateAntColony(Random randomGenerator, int numberOfAnts)
-        {
-            List<Ant> ants = new List<Ant>();
-
-            for (int i = 0; i < numberOfAnts; i++)
-            {
-                var drawnNumber = randomGenerator.Next(matrixSize);
-                ants.Add(AntColonyManager.CreateNewAnt(drawnNumber));
-            }
-            return ants;
         }
 
         static private List<double> CalculateNextCitiesProbability(Ant ant, PheromoneMatrixManager phm, int[,] distanceMatrix)
@@ -144,9 +124,53 @@ namespace AntColonyOptimization
                     }
                     probabilityList.Add(numerator);
                     denominator += Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], alfa) * Math.Pow(phm.PheromoneMatrix[ant.currentCityID, cityID], beta);
-                }                
+                }
             }
             return probabilityList.Select(x => Math.Round((x / denominator), 4)).ToList();
+        }
+
+        private static int ChooseNextCityForAnt(Ant ant, List<double> probabilityList, Random randomGenerator)
+        {
+            var probabilitySum = probabilityList.Sum();
+            probabilityList = probabilityList.Select(x => Math.Round(x / probabilitySum, 10)).ToList();
+            var drawnNumber = randomGenerator.NextDouble();
+            int i = 0;
+            var currentProbabilitySum = probabilityList[i];
+            
+            while(drawnNumber > currentProbabilitySum || ant.visitedCitiesIdList.Contains(i))
+            {
+                i++;
+                currentProbabilitySum += probabilityList[i];               
+            }
+            return i;
+        }
+
+        private static void MoveAntToNextCity(Ant ant, int nextCityForAnt, PheromoneMatrixManager phm, int[,] distanceMatrix)
+        {
+            var distanceBetweenCities = distanceMatrix[ant.currentCityID, nextCityForAnt];
+            ant.distance += distanceBetweenCities;
+
+            if (nextCityForAnt != ant.currentCityID)
+            {
+                phm.UpdateSelectedPhermoneMatrixCell(ant.currentCityID, nextCityForAnt, 1 / (Math.Pow(distanceBetweenCities, 2)));
+            }
+            ant.currentCityID = nextCityForAnt;
+            ant.visitedCitiesIdList.Add(nextCityForAnt);
+        }      
+
+        private static void CheckIsBestRouteCorrect(int[,] distanceMatrix, PheromoneMatrixManager phm)
+        {
+            var checkingList = bestRoute;
+            checkingList.Add(checkingList.First());
+            checkingList.RemoveAt(0);
+
+            var ant = new Ant(checkingList.Last());
+
+            for (int i = 0; i < checkingList.Count; i++)
+            {
+                MoveAntToNextCity(ant, checkingList[i], phm, distanceMatrix);
+            }
+            Console.WriteLine($"Best ant should travel {ant.distance}. {bestDistance-ant.distance}");                      
         }
     }
 }

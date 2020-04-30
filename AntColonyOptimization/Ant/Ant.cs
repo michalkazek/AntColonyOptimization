@@ -17,7 +17,7 @@ namespace AntColonyOptimization
         {
             distance = 0.0f;
             currentCityID = startingCityID;
-            visitedCitiesIdList = new List<int>();
+            visitedCitiesIdList = new List<int>() { startingCityID };
         }
     }
 }
