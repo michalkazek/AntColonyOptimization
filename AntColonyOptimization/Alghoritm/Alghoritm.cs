@@ -33,7 +33,8 @@ namespace AntColonyOptimization
         {
             GeneratePrerequisite(fileName);
             Start(numberOfAnts, numberOfIterations);            
-            PrintSummary(DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance));           
+            PrintSummary(DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance));
+            FileWriter.SaveSummaryIntoFile(BestFoundDistance, Alfa, Beta, numberOfAnts, numberOfIterations);          
         }        
 
         private void GeneratePrerequisite(string fileName)

@@ -10,11 +10,16 @@ namespace AntColonyOptimization
     {              
         public static void Run()
         {
+            var inputParameteres = InputReader.ReadInputParamteres();
             Random randomGenerator = new Random();
-            var firstRun = new Alghoritm(1, 5, 0.001f, 0.000001f, randomGenerator);
-            firstRun.Run(30, 100, "berlin52");         
-
-            Console.ReadKey();
+            foreach (var item in inputParameteres)
+            {
+                var currentRun = new Alghoritm(item.Key[1], item.Key[2], 0.005f, 0.0000000010f, randomGenerator);
+                for (int i = 0; i < item.Key[5]; i++)
+                {
+                    currentRun.Run(item.Key[3], item.Key[4], item.Value);
+                }
+            }            
         }     
     }
 }

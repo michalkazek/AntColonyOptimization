@@ -26,7 +26,7 @@ namespace AntColonyOptimization
             }
             else
             {
-                return "INCORRECT";
+                throw new Exception("INCORRECT");
             }            
         }
     }

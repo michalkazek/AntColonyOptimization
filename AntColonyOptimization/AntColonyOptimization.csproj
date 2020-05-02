@@ -48,6 +48,8 @@
     <Compile Include="Ant\AntColonyManager.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="FileReader\FileReader.cs" />
+    <Compile Include="FileWriter\FileWriter.cs" />
+    <Compile Include="InputReader\InputReader.cs" />
     <Compile Include="Pheromone\PheromoneMatrixManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
