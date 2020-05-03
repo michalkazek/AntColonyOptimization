@@ -9,13 +9,13 @@ namespace AntColonyOptimization
 {
     static class FileWriter
     {
-        public static void SaveSummaryIntoFile(float bestFoundDistance, float alfa, float beta, int numberOfAnts, int numberOfIterations)
+        public static void SaveSummaryIntoFile(float firstFoundDistance, float bestFoundDistance, float alfa, float beta, int numberOfAnts, int numberOfIterations, string inputFileName)
         {
-            var fileName = $"result-{numberOfAnts}_{numberOfIterations}_{alfa}_{beta}";
+            var fileName = $"{inputFileName}-{numberOfAnts}_{numberOfIterations}_{alfa}_{beta}";
             var path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + $@"\Results\{fileName}.txt";
             using (var outputFile = new StreamWriter(path, append: true))
             {
-                outputFile.WriteLine(bestFoundDistance);
+                outputFile.WriteLine($"{bestFoundDistance}, {firstFoundDistance}");
             }
         }
     }

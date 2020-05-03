@@ -18,6 +18,7 @@ namespace AntColonyOptimization
         public int MatrixSize { get; set; }
         public double[,] PheromoneMatrix { get; set; }
         public float BestFoundDistance { get; set; }
+        public float FirstFoundDistance { get; set; }
         public List<int> BestFoundRoute { get; set; }
 
         public Alghoritm(float alfa, float beta, float startingPheromoneValue, float evaporationValue, Random randomGenerator)
@@ -33,8 +34,8 @@ namespace AntColonyOptimization
         {
             GeneratePrerequisite(fileName);
             Start(numberOfAnts, numberOfIterations);            
-            PrintSummary(DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance));
-            FileWriter.SaveSummaryIntoFile(BestFoundDistance, Alfa, Beta, numberOfAnts, numberOfIterations);          
+            //PrintSummary(DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance));
+            FileWriter.SaveSummaryIntoFile(FirstFoundDistance, BestFoundDistance, Alfa, Beta, numberOfAnts, numberOfIterations, fileName);          
         }        
 
         private void GeneratePrerequisite(string fileName)
@@ -43,7 +44,6 @@ namespace AntColonyOptimization
             DistanceMatrix = fileReader.CreateDistanceMatrix();
             MatrixSize = fileReader.GetMatrixSize();
             PheromoneMatrix = PheromoneMatrixManager.CreatePhermoneMatrix(MatrixSize, StartingPheromoneValue);
-            BestFoundDistance = 10000000;
             BestFoundRoute = new List<int>();
         }
 
@@ -135,12 +135,15 @@ namespace AntColonyOptimization
 
         private void CheckIfBetterSolutionWasFound(List<Ant> antColony, int iteration)
         {
+            if (iteration == 0)
+            {
+                FirstFoundDistance = antColony[0].distance;
+            }      
             antColony.ForEach(ant => {
-                if (ant.distance < BestFoundDistance)
-                {
+                if (ant.distance < BestFoundDistance || iteration == 0)
+                {                    
                     BestFoundDistance = ant.distance;
                     BestFoundRoute = new List<int>(ant.visitedCitiesIdList);
-                    Console.WriteLine($"Ant travelled {BestFoundDistance} in {iteration}.");
                 }
             });
         }
