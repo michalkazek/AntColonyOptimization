@@ -10,7 +10,7 @@ namespace AntColonyOptimization
     {
         static void Main(string[] args)
         {
-            Application.Run();
+            Application.Run(args[0]);
         }
     }
 }

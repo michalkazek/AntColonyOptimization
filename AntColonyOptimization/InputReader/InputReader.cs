@@ -9,10 +9,9 @@ namespace AntColonyOptimization
 {
     class InputReader
     {
-        public static Dictionary<List<int>, string> ReadInputParamteres()
+        public static Dictionary<List<int>, string> ReadInputParamteres(string filePath)
         {
             var parameterList = new Dictionary<List<int>, string>();
-            string filePath = $@"D:\Dokumenty\Visual Studio 2015\Projects\AntColonyOptimization\AntColonyOptimization\Input\inputFile.txt";
             using (StreamReader reader = new StreamReader(filePath))
             {
                 int id = 0;

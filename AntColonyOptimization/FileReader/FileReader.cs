@@ -27,7 +27,7 @@ namespace AntColonyOptimization
             List<string> splittedLine = new List<string>();
             while (!isFileCorrect)
             {
-                string filePath = $@"D:\Dokumenty\Visual Studio 2015\Projects\AntColonyOptimization\AntColonyOptimization\Data\{FileName}.txt";
+                string filePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + $@"\Data\{FileName}.txt";
                 try
                 {
                     using (StreamReader reader = new StreamReader(filePath))

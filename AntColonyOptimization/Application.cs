@@ -8,9 +8,9 @@ namespace AntColonyOptimization
 {
     class Application
     {              
-        public static void Run()
+        public static void Run(string filePath)
         {
-            var inputParameteres = InputReader.ReadInputParamteres();
+            var inputParameteres = InputReader.ReadInputParamteres(filePath);
             Random randomGenerator = new Random();
             foreach (var item in inputParameteres)
             {
