@@ -242,3 +242,5 @@ ModelManifest.xml
 .fake/
 /AntColonyOptimization/Results
 /AntColonyOptimization/Input
+/AntColonyOptimization/Data/FileChanger.lnk
+/AntColonyOptimization/Data/Test

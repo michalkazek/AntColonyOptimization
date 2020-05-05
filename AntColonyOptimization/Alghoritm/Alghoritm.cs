@@ -19,6 +19,7 @@ namespace AntColonyOptimization
         public double[,] PheromoneMatrix { get; set; }
         public float BestFoundDistance { get; set; }
         public float FirstFoundDistance { get; set; }
+        public int BestFoundDistanceIteration { get; set; }
         public List<int> BestFoundRoute { get; set; }
 
         public Alghoritm(float alfa, float beta, float startingPheromoneValue, float evaporationValue, Random randomGenerator)
@@ -35,7 +36,7 @@ namespace AntColonyOptimization
             GeneratePrerequisite(fileName);
             Start(numberOfAnts, numberOfIterations);            
             //PrintSummary(DistanceChecker.CheckIsBestRouteCorrect(MoveAntToNextCity, BestFoundRoute, BestFoundDistance));
-            FileWriter.SaveSummaryIntoFile(FirstFoundDistance, BestFoundDistance, Alfa, Beta, numberOfAnts, numberOfIterations, fileName);          
+            FileWriter.SaveSummaryIntoFile(FirstFoundDistance, BestFoundDistance, BestFoundDistanceIteration, Alfa, Beta, numberOfAnts, numberOfIterations, fileName);          
         }        
 
         private void GeneratePrerequisite(string fileName)
@@ -138,12 +139,14 @@ namespace AntColonyOptimization
             if (iteration == 0)
             {
                 FirstFoundDistance = antColony[0].distance;
+                BestFoundDistanceIteration = 0;
             }      
             antColony.ForEach(ant => {
                 if (ant.distance < BestFoundDistance || iteration == 0)
                 {                    
                     BestFoundDistance = ant.distance;
                     BestFoundRoute = new List<int>(ant.visitedCitiesIdList);
+                    BestFoundDistanceIteration = iteration;
                 }
             });
         }
