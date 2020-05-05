@@ -22,6 +22,7 @@ namespace AntColonyOptimization
             string currentLine;
             int[,] distanceMatrix = null;
             bool isFileCorrect = false;
+            bool isFileSymetric = true;
 
             List<string> splittedLine = new List<string>();
             while (!isFileCorrect)
@@ -38,10 +39,17 @@ namespace AntColonyOptimization
                         {
                             currentLine = reader.ReadLine();
                             splittedLine.AddRange(currentLine.Trim().Split(' '));
+                            if(rowId == 0 && splittedLine.Count == matrixSize)
+                            {
+                                isFileSymetric = false;
+                            }
                             for (int columnId = 0; columnId < splittedLine.Count; columnId++)
                             {
-                                distanceMatrix[columnId, rowId] = int.Parse(splittedLine[columnId]);
                                 distanceMatrix[rowId, columnId] = int.Parse(splittedLine[columnId]);
+                                if (isFileSymetric)
+                                {
+                                    distanceMatrix[columnId, rowId] = int.Parse(splittedLine[columnId]);
+                                }    
                             }
                             splittedLine.Clear();
                         }
